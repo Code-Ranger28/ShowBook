@@ -9,10 +9,16 @@ import Moviecard from './MovieCard';
 
 const MovieCarousel = () => {
 
-    
+    interface User {
+        id: string;
+        name: string;
+        email: string;
+        profilePicture?: string; // Optional field
+    }      
 
-    const [movies, setMovies] = React.useState<MovieCardType[]>([])
-    const [user, setUser] = React.useState<any>(null)
+    const [movies, setMovies] = React.useState<MovieCardType[]>([]);
+    const [user, setUser] = React.useState<User | null>(null);
+
     const getMovies = async () => {
         fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/movie/movies`, {
             method: 'GET',
@@ -22,19 +28,15 @@ const MovieCarousel = () => {
             credentials: 'include'
         })
         .then((res) => res.json())
-            .then((data) => {
-                if(data.ok){
-                    //console.log(data)
-                    setMovies(data.data)
-                }
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-    }
+        .then((data) => {
+            if(data.ok){
+                setMovies(data.data);
+            }
+        })
+        .catch((err) => console.log(err));
+    };
 
     const getUser = async () => {
-
         fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/auth/getuser`, {
             method: 'GET',
             headers: {
@@ -42,73 +44,47 @@ const MovieCarousel = () => {
             },
             credentials: 'include'
         })
-        .then((res) => {
-            return res.json();
-        })
+        .then((res) => res.json())
         .then((response) => {
             if(response.ok) {
-                setUser(response.data)
-                
-            }
-            else
-            {
-                window.location.href = '/auth/signin'
-
+                setUser(response.data);
+            } else {
+                window.location.href = '/auth/signin';
             }
         })
-        .catch((error) => {
-            console.log(error)
-        })
-    }
+        .catch((error) => console.log(error));
+    };
     
     React.useEffect(() => {
-        getMovies()
-        getUser()
-    }, [])
+        getMovies();
+        getUser();
+    }, []);
 
-  return (
-    <div className='sliderout'>
-        <Swiper
+    return (
+        <div className='sliderout'>
+            <Swiper
                 slidesPerView={1}
                 spaceBetween={1}
-                pagination={{
-                    clickable: true,
-                }}
+                pagination={{ clickable: true }}
                 breakpoints={{
-                    '@0.00': {
-                        slidesPerView: 1,
-                        spaceBetween: 2,
-                    },
-                    '@0.75': {
-                        slidesPerView: 2,
-                        spaceBetween: 2,
-                    },
-                    '@1.00': {
-                        slidesPerView: 3,
-                        spaceBetween: 2,
-                    },
-                    '@1.50': {
-                        slidesPerView: 6,
-                        spaceBetween: 2,
-                    },
+                    '@0.00': { slidesPerView: 1, spaceBetween: 2 },
+                    '@0.75': { slidesPerView: 2, spaceBetween: 2 },
+                    '@1.00': { slidesPerView: 3, spaceBetween: 2 },
+                    '@1.50': { slidesPerView: 6, spaceBetween: 2 },
                 }}
                 modules={[Pagination]}
                 className="mySwiper"
             >
-                {
-                    movies.map((movie) => {
-                        return (
-                            <SwiperSlide >
-                                <Moviecard  
-                                movie={movie}
-                                user={user}/>
-                            </SwiperSlide>
-                        )
-                    })
-                }
+                {movies.map((movie) => (
+                    <SwiperSlide key={movie._id}>  {/* ✅ Fixed missing key error */}
+                        <Moviecard movie={movie} user={user} />
+                    </SwiperSlide>
+                ))}
             </Swiper>
-    </div>
-  )
-}
+        </div>
+    );
+};
 
-export default MovieCarousel
+
+
+export default MovieCarousel;
