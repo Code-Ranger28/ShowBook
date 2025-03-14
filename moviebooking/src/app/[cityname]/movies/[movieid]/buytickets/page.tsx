@@ -1,127 +1,103 @@
 "use client"
-import React from 'react'
-import DatePicker from "react-horizontal-datepicker";
-import './BuyTicketsPage.css'
+import React, { useEffect, useState } from 'react';
+import DatePicker from 'react-date-picker';
+import 'react-date-picker/dist/DatePicker.css';
+import 'react-calendar/dist/Calendar.css';
 import Link from 'next/link';
-import { useParams, usePathname  } from 'next/navigation'
+import { useParams, usePathname } from 'next/navigation';
+import './BuyTicketsPage.css';
 
-const page = () => {
-    const pathname = usePathname()
-    const params = useParams()
-    const { movieid, cityname } = params
-    const [selectedDate, setSelectedDate] = React.useState<any>(new Date())
-    const [movie, setMovie] = React.useState<any>(null)
-    const [theatres, setTheatres] = React.useState<any>(null)
+const Page = () => {
+    const pathname = usePathname();
+    const params = useParams();
+    const { movieid, cityname } = params;
+
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+    const [movie, setMovie] = useState<any>(null);
+    const [theatres, setTheatres] = useState<any[]>([]);
 
     const getMovie = async () => {
-        fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/movie/movies/${movieid}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include'
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.ok) {
-                    console.log(data)
-                    setMovie(data.data)
-                }
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-    }
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/movie/movies/${movieid}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            });
+            const data = await res.json();
+            if (data.ok) {
+                setMovie(data.data);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     const getTheatres = async (date: string) => {
-        let movieId = movieid
-        let city = cityname
-        console.log(date)
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/movie/screensbymovieschedule/${cityname}/${date}/${movieid}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            });
+            const data = await res.json();
+            if (data.ok) {
+                setTheatres(data.data);
+            } else {
+                setTheatres([]);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
-        fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/movie/screensbymovieschedule/${city}/${date}/${movieId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include'
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.ok) {
-                    console.log(data)
-                    setTheatres(data.data)
-                }
-                else {
-                    console.log(data)
-                }
-            })
-            .catch((err) => {
-                 console.log(err)
-             })
-    }
+    useEffect(() => {
+        getMovie();
+    }, []);
 
-    React.useEffect(() => {
-        getMovie()
-    }, [])
+    useEffect(() => {
+        if (selectedDate) {
+            getTheatres(selectedDate.toISOString().split('T')[0]);
+        }
+    }, [selectedDate]);
 
-    React.useEffect(() => {
-        getTheatres(selectedDate)
-    }, [selectedDate])
-
-
-  return (
-    <>
-            {
-                movie &&
+    return (
+        <>
+            {movie && (
                 <div className='buytickets'>
                     <div className='s1'>
                         <div className='head'>
                             <h1>{movie.title} - {movie.language}</h1>
-                            <h3>{movie.genre.join(",")}</h3>
+                            <h3>{movie.genre.join(", ")}</h3>
                         </div>
-                        <DatePicker getSelectedDay={
-                            (date: any) => {
-                                console.log(date)
-                                setSelectedDate(date)
-                            }
-                        }
-                            endDate={100}
-                            selectDate={
-                                selectedDate
-                            }
-                            labelFormat={"MMMM"}
-                            color={"rgb(248, 68, 100)"}
+                        <DatePicker
+                            onChange={(date) => setSelectedDate(Array.isArray(date) ? date[0] : date || new Date())}
+                            value={selectedDate}
                         />
                     </div>
 
-                    {
-                        theatres && theatres.length >0 ?
+                    {theatres.length > 0 ? (
                         <div className="screens">
-                            {
-                                theatres.map((screen, index)=> {
-                                    let screenid = screen._id
-                                    return (
-                                        <div className='screen' key={index}>
-                                            <div>
-                                                <h2>{screen.name}</h2>
-                                                <h3>{screen.location}</h3>
-                                            </div>
-
-                                            <Link href={`${pathname}/${screenid}?date=${selectedDate}`} className='theme_btn1 linkstylenone'>Select</Link>
-
-                                        </div>
-                                    )
-                                })
-                            }
+                            {theatres.map((screen, index) => (
+                                <div className='screen' key={index}>
+                                    <div>
+                                        <h2>{screen.name}</h2>
+                                        <h3>{screen.location}</h3>
+                                    </div>
+                                    <Link href={`${pathname}/${screen._id}?date=${selectedDate}`} className='theme_btn1 linkstylenone'>
+                                        Select
+                                    </Link>
+                                </div>
+                            ))}
                         </div>
-                        :
+                    ) : (
                         <div className="screens">
                             <h1>No shows available</h1>
                         </div>
-                    }
+                    )}
                 </div>
-            }
+            )}
         </>
-  )
-}
+    );
+};
 
-export default page
+export default Page;
