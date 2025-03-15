@@ -73,7 +73,7 @@ const Page = () => {
   return (
     <>
       {movie && (
-        <div className=buytickets>
+        <div className="buytickets">
           <div className="s1">
             <div className="head">
               <h1>
