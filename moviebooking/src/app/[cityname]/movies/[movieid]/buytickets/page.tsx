@@ -5,7 +5,7 @@ import "react-date-picker/dist/DatePicker.css";
 import "react-calendar/dist/Calendar.css";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import "./BuyTicketsPage.css";
+import "./BuyTicketsPage.module.css";
 
 // Define types for movie and theatre
 interface Movie {
