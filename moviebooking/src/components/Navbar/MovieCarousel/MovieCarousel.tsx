@@ -3,7 +3,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
-import MovieCard from "./MovieCard"; // ✅ Ensure correct import
+import MovieCard from "./MovieCard";
 
 // Define the user type
 interface User {
@@ -25,8 +25,11 @@ interface Movie {
 const MovieCarousel: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [user, setUser] = useState<User | null>(null);
+  const [isClient, setIsClient] = useState(false); // ✅ Prevents SSR issue
 
   useEffect(() => {
+    setIsClient(true); // ✅ Ensures client-side execution
+
     const fetchMovies = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/movie/movies`, {
@@ -35,10 +38,10 @@ const MovieCarousel: React.FC = () => {
           credentials: "include",
         });
 
+        if (!res.ok) throw new Error("Failed to fetch movies");
+
         const data = await res.json();
-        if (data.ok) {
-          setMovies(data.data);
-        }
+        setMovies(data?.data || []);
       } catch (error) {
         console.error("Error fetching movies:", error);
       }
@@ -52,12 +55,15 @@ const MovieCarousel: React.FC = () => {
           credentials: "include",
         });
 
-        const response = await res.json();
-        if (response.ok) {
-          setUser(response.data);
-        } else {
-          window.location.href = "/auth/signin";
+        if (!res.ok) {
+          if (typeof window !== "undefined") {
+            window.location.href = "/auth/signin"; // ✅ Client-side only
+          }
+          return;
         }
+
+        const response = await res.json();
+        setUser(response?.data || null);
       } catch (error) {
         console.error("Error fetching user:", error);
       }
@@ -67,6 +73,8 @@ const MovieCarousel: React.FC = () => {
     fetchUser();
   }, []);
 
+  if (!isClient) return null; // ✅ Avoid rendering on the server
+
   return (
     <div className="sliderout">
       <Swiper
@@ -74,19 +82,23 @@ const MovieCarousel: React.FC = () => {
         spaceBetween={1}
         pagination={{ clickable: true }}
         breakpoints={{
-          "@0.00": { slidesPerView: 1, spaceBetween: 2 },
-          "@0.75": { slidesPerView: 2, spaceBetween: 2 },
-          "@1.00": { slidesPerView: 3, spaceBetween: 2 },
-          "@1.50": { slidesPerView: 6, spaceBetween: 2 },
+          0: { slidesPerView: 1, spaceBetween: 2 },
+          750: { slidesPerView: 2, spaceBetween: 2 },
+          1000: { slidesPerView: 3, spaceBetween: 2 },
+          1500: { slidesPerView: 6, spaceBetween: 2 },
         }}
         modules={[Pagination]}
         className="mySwiper"
       >
-        {movies.map((movie) => (
-          <SwiperSlide key={movie._id}>
-            <MovieCard movie={movie} user={user} /> {/* ✅ Correctly passing 'user' */}
-          </SwiperSlide>
-        ))}
+        {movies.length > 0 ? (
+          movies.map((movie) => (
+            <SwiperSlide key={movie._id}>
+              <MovieCard movie={movie} user={user} />
+            </SwiperSlide>
+          ))
+        ) : (
+          <p>No movies available</p>
+        )}
       </Swiper>
     </div>
   );
