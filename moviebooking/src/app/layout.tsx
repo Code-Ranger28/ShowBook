@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import "../../styles/BuyTicketsPage.css";
+import "@/styles/BuyTicketsPage.css";
 import Navbar from "@/components/Navbar/Navbar";
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
