@@ -1,40 +1,50 @@
-import React from 'react'
-import { useRouter } from 'next/navigation';
-import { BsFillStarFill } from 'react-icons/bs';
-import './MovieCard.css'
+import React from "react";
+import { useRouter } from "next/navigation";
+import { BsFillStarFill } from "react-icons/bs";
+import "./MovieCard.css";
 
-const Moviecard = (data: any) => {
-    const router = useRouter();
-    //const { city } = data.user;
-    const city ='Mumbai'
-    
-    const {_id, title, genre, rating, portraitImgUrl} = data.movie;
-  return (
-    <div
-            className='moviecard'
-            onClick={() => {
-                router.push(`/${city}/movies/${_id}`)
-            }}
-        >
-            <div className='movieimg'
-        style={{
-            backgroundImage: `url(${portraitImgUrl})`
-        }}
-    >
-        <p className='rating'>
-            <BsFillStarFill className='star' />&nbsp;&nbsp;
-            {rating}/10</p>
-        </div>
-        <div className='details'>
-                <p className='title'>
-                    {title}
-                </p>
-                <p className='type'>
-                    {genre.join(", ")}
-                </p>
-            </div>
-    </div>
-  )
+// Define the movie type
+interface Movie {
+  _id: string;
+  title: string;
+  genre: string[];
+  rating: number;
+  portraitImgUrl: string;
 }
 
-export default Moviecard
+// Define the prop type
+interface MovieCardProps {
+  movie: Movie;
+}
+
+const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
+  const router = useRouter();
+  const city = "Mumbai"; // Assuming Mumbai is a default value
+
+  return (
+    <div
+      className="moviecard"
+      onClick={() => {
+        router.push(`/${city}/movies/${movie._id}`);
+      }}
+    >
+      <div
+        className="movieimg"
+        style={{
+          backgroundImage: `url(${movie.portraitImgUrl})`,
+        }}
+      >
+        <p className="rating">
+          <BsFillStarFill className="star" /> &nbsp;&nbsp;
+          {movie.rating}/10
+        </p>
+      </div>
+      <div className="details">
+        <p className="title">{movie.title}</p>
+        <p className="type">{movie.genre.join(", ")}</p>
+      </div>
+    </div>
+  );
+};
+
+export default MovieCard;
