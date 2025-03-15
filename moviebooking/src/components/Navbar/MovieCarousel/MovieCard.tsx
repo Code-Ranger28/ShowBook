@@ -1,5 +1,4 @@
 import React from 'react'
-import { MovieCardType } from '@/types/types';
 import { useRouter } from 'next/navigation';
 import { BsFillStarFill } from 'react-icons/bs';
 import './MovieCard.css'
