@@ -5,7 +5,7 @@ import "react-date-picker/dist/DatePicker.css";
 import "react-calendar/dist/Calendar.css";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import "./BuyTicketsPage.module.css";
+import styles from "./BuyTicketsPage.module.css";
 
 // Define types for movie and theatre
 interface Movie {
@@ -73,7 +73,7 @@ const Page = () => {
   return (
     <>
       {movie && (
-        <div className="buytickets">
+        <div className={styles.buytickets}>
           <div className="s1">
             <div className="head">
               <h1>
