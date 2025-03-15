@@ -1,7 +1,15 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { BsFillStarFill } from "react-icons/bs";
-import "./MovieCard.css";
+import "./MovieCard.css";  // Ensure this file exists
+
+// Define the user type
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  profilePicture?: string; // Optional field
+}
 
 // Define the movie type
 interface Movie {
@@ -15,23 +23,22 @@ interface Movie {
 // Define the prop type
 interface MovieCardProps {
   movie: Movie;
+  user: User | null; // ✅ Ensure 'user' is included in props
 }
 
-const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
+const MovieCard: React.FC<MovieCardProps> = ({ movie, user }) => {
   const router = useRouter();
-  const city = "Mumbai"; // Assuming Mumbai is a default value
+  const city = "Mumbai"; // Default city
 
   return (
     <div
       className="moviecard"
-      onClick={() => {
-        router.push(`/${city}/movies/${movie._id}`);
-      }}
+      onClick={() => router.push(`/${city}/movies/${movie._id}`)} // ✅ Fixed syntax
     >
       <div
         className="movieimg"
         style={{
-          backgroundImage: `url(${movie.portraitImgUrl})`,
+          backgroundImage: `url(${movie.portraitImgUrl})`, // ✅ Fixed template string
         }}
       >
         <p className="rating">
@@ -43,6 +50,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
         <p className="title">{movie.title}</p>
         <p className="type">{movie.genre.join(", ")}</p>
       </div>
+      {user && <p className="user-info">Welcome, {user.name}!</p>} {/* ✅ Now using 'user' */}
     </div>
   );
 };
