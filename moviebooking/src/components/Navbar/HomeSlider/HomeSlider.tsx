@@ -14,7 +14,7 @@ const width = window.innerWidth;
 const height = window.innerHeight;
 const HomeSlider = () => {
 
-    const [banners, setBanners] = useState([
+    const [banners] = useState([
         {
             imgUrl: 'https://assets-in.bmscdn.com/promotions/cms/creatives/1693561351496_motogpsepdesktop.jpg'
         },
@@ -22,7 +22,7 @@ const HomeSlider = () => {
             imgUrl: 'https://assets-in.bmscdn.com/promotions/cms/creatives/1693472198837_iccdesktop.jpg'
         }
     ])
-    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+    const [, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     // Run only on the client side
