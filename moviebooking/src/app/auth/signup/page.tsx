@@ -36,13 +36,13 @@ const Signup = () => {
     e.preventDefault();
     setErrors({});
 
-    // ✅ Ensure confirmPassword is used in validation
+    // ✅ Client-side validation
     const validationErrors: Record<string, string> = {};
     if (!formData.name) validationErrors.name = "Name is required";
     if (!formData.email) validationErrors.email = "Email is required";
     if (!formData.password) validationErrors.password = "Password is required";
     if (!formData.city) validationErrors.city = "City is required";
-    
+
     if (!formData.confirmPassword) {
       validationErrors.confirmPassword = "Confirm Password is required";
     } else if (formData.password !== formData.confirmPassword) {
@@ -55,8 +55,9 @@ const Signup = () => {
     }
 
     try {
-      // ✅ Rename confirmPassword before excluding it to prevent ESLint errors
-      const { confirmPassword: _confirmPassword, ...payload } = formData; 
+      // ✅ Remove confirmPassword before sending request
+      const { confirmPassword, ...payload } = formData;
+      delete payload.confirmPassword;
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/auth/register`, {
         method: "POST",
