@@ -52,8 +52,8 @@ const Signup = () => {
   }
 
   try {
-    // ✅ Extract confirmPassword to avoid ESLint error
-    const { confirmPassword: _, ...payload } = formData; 
+    // ✅ Correct fix: Remove `confirmPassword` without assigning an unused variable
+    const { confirmPassword, ...payload } = formData; 
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/auth/register`, {
       method: "POST",
@@ -73,6 +73,7 @@ const Signup = () => {
     toast.error("Registration failed. Please try again.", { autoClose: 2000 });
   }
 };
+
 
   return (
     <div className="authout">
