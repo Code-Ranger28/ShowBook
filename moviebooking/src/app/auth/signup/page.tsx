@@ -52,26 +52,26 @@ const Signup = () => {
   }
 
   try {
-    // ✅ Avoid unused variable by using "({ confirmPassword, ...payload })"
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(({ confirmPassword, ...payload } = formData, payload)), 
-    });
+  const { confirmPassword, ...payload } = formData; // ✅ Correctly destructure
 
-    const response = await res.json();
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload), // ✅ Only send needed data
+  });
 
-    if (res.ok) {
-      toast.success(response.message, { autoClose: 2000 });
-      router.push("/auth/signin");
-    } else {
-      toast.error(response.message, { autoClose: 2000 });
-    }
-  } catch (err) {
-    toast.error("Registration failed. Please try again.", { autoClose: 2000 });
+  const response = await res.json();
+
+  if (res.ok) {
+    toast.success(response.message, { autoClose: 2000 });
+    router.push("/auth/signin");
+  } else {
+    toast.error(response.message, { autoClose: 2000 });
   }
+} catch (err) {
+  toast.error("Registration failed. Please try again.", { autoClose: 2000 });
+}
 };
-
 
   return (
     <div className="authout">
