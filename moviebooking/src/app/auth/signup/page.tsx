@@ -55,7 +55,8 @@ const Signup = () => {
     }
 
     try {
-      const { confirmPassword, ...payload } = formData; // ✅ Now safe to exclude confirmPassword
+      // ✅ Rename confirmPassword before excluding it to prevent ESLint errors
+      const { confirmPassword: _confirmPassword, ...payload } = formData; 
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/auth/register`, {
         method: "POST",
