@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation"; // ✅ Use Next.js router
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import logo from "@/assets/logo.png";
@@ -16,7 +16,7 @@ interface FormData {
 }
 
 const Signup = () => {
-  const router = useRouter(); // ✅ Use Next.js router
+  const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
@@ -32,79 +32,42 @@ const Signup = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-//   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-//     e.preventDefault();
-//     setErrors({});
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setErrors({});
 
-//     // ✅ Client-side validation
-//     const validationErrors: Record<string, string> = {};
-//     if (!formData.name) validationErrors.name = "Name is required";
-//     if (!formData.email) validationErrors.email = "Email is required";
-//     if (!formData.password) validationErrors.password = "Password is required";
-//     if (!formData.city) validationErrors.city = "City is required";
-//     if (formData.password !== formData.confirmPassword) {
-//       validationErrors.confirmPassword = "Passwords do not match";
-//     }
-
-//     if (Object.keys(validationErrors).length > 0) {
-//       setErrors(validationErrors);
-//       return;
-//     }
-
-//     try {
-//       const { confirmPassword, ...payload } = formData; // ✅ Remove `confirmPassword`
-//       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/auth/register`, {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(payload),
-//       });
-
-//       const response = await res.json();
-
-//       if (res.ok) {
-//         toast.success(response.message, { autoClose: 2000 });
-
-//         // ✅ Use router.push instead of `window.location.href`
-//         router.push("/auth/signin");
-//       } else {
-//         toast.error(response.message, { autoClose: 2000 });
-//       }
-//     } catch (err) {
-//       toast.error("Registration failed. Please try again.", { autoClose: 2000 });
-//     }
-//   };
- const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-     e.preventDefault();
-     setErrors({});
-  
-    // ✅ Client-side validation
+    // ✅ Ensure confirmPassword is used in validation
     const validationErrors: Record<string, string> = {};
     if (!formData.name) validationErrors.name = "Name is required";
     if (!formData.email) validationErrors.email = "Email is required";
     if (!formData.password) validationErrors.password = "Password is required";
     if (!formData.city) validationErrors.city = "City is required";
-    if (formData.password !== formData.confirmPassword) {
+    
+    if (!formData.confirmPassword) {
+      validationErrors.confirmPassword = "Confirm Password is required";
+    } else if (formData.password !== formData.confirmPassword) {
       validationErrors.confirmPassword = "Passwords do not match";
     }
-  
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-  
+
     try {
-      const { confirmPassword, ...payload } = formData; // ✅ This removes confirmPassword only when sending data
+      const { confirmPassword, ...payload } = formData; // ✅ Now safe to exclude confirmPassword
+
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-  
+
       const response = await res.json();
-  
+
       if (res.ok) {
         toast.success(response.message, { autoClose: 2000 });
-        router.push("/auth/signin"); // ✅ Redirect after successful signup
+        router.push("/auth/signin");
       } else {
         toast.error(response.message, { autoClose: 2000 });
       }
@@ -112,7 +75,6 @@ const Signup = () => {
       toast.error("Registration failed. Please try again.", { autoClose: 2000 });
     }
   };
-  
 
   return (
     <div className="authout">
