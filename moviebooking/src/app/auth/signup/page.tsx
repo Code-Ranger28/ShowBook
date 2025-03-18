@@ -52,13 +52,11 @@ const Signup = () => {
   }
 
   try {
-    // ✅ Correct fix: Remove `confirmPassword` without assigning an unused variable
-    const { confirmPassword, ...payload } = formData; 
-
+    // ✅ Avoid unused variable by using "({ confirmPassword, ...payload })"
     const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(({ confirmPassword, ...payload } = formData, payload)), 
     });
 
     const response = await res.json();
